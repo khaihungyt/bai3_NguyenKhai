@@ -1,0 +1,236 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Category {
+  categoryID: String!
+  categoryName: String!
+  isHidden: Boolean
+  book: [Book!]
+}
+
+type Order {
+  orderID: String!
+  address: String!
+  dateAdd: DateTime!
+  status: String!
+  user: User!
+  orderDetails: [OrderDetail!]!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type OrderDetail {
+  orderdetailID: String!
+  quantity: Int!
+  costABook: Float!
+  book: Book!
+  order: Order!
+}
+
+type Book {
+  bookID: String!
+  bookName: String!
+  author: String!
+  bookNumber: Int!
+  priceABook: Float!
+  isHidden: Boolean
+  category: [Category!]
+  orderdetails: [OrderDetail!]
+  cartDetails: [CartDetail!]
+}
+
+type CartDetail {
+  cartDetailID: String!
+  quantity: Int!
+  book: Book!
+  cart: Cart!
+}
+
+type Cart {
+  cartID: String!
+  dateAdd: DateTime!
+  user: User!
+  cartDetails: [CartDetail!]!
+}
+
+type User {
+  userID: String!
+  username: String
+  fullname: String
+  role: Role
+  isHidden: Boolean
+  posts: [Post!]
+  orders: [Order!]
+  cart: Cart
+  comments: [Comment!]!
+}
+
+"""The role of the account"""
+enum Role {
+  ADMIN
+  CUSTOMER
+}
+
+type Post {
+  postID: String!
+  title: String!
+  description: String!
+  isHidden: Boolean
+  user: User!
+  comment: [Comment!]!
+}
+
+type Comment {
+  commentID: String!
+  description: String!
+  user: User!
+  post: Post!
+}
+
+type LoginResponse {
+  access_token: String!
+  user: User!
+}
+
+type Query {
+  hello: String!
+  users: [User!]!
+  user(id: String!): User!
+  login(username: String!, password: String!): String!
+  securedResource: String!
+  books: [Book!]!
+  somebooks(name: String!): [Book!]!
+  book(id: String!): Book!
+  categories: [Category!]!
+  category(id: String!): Category!
+  posts: [Post!]!
+  post(postid: String!): Post!
+  cart(id: String!): Cart!
+  comments: [Comment!]!
+  comment(commentid: String!): Comment!
+  orders: [Order!]!
+  someorderuser(userid: String!): [Order!]!
+}
+
+type Mutation {
+  createUser(createUserInput: CreateUserInput!): User!
+  updateUser(updateUserInput: UpdateUserInput!): User!
+  removeUser(id: String!): User!
+  createBook(createBookInput: CreateBookInput!): Book!
+  updateBook(updateBookInput: UpdateBookInput!): Book!
+  removeBook(id: String!): Book!
+  createCategory(createCategoryInput: CreateCategoryInput!): Category!
+  updateCategory(updateCategoryInput: UpdateCategoryInput!): Category!
+  removeCategory(id: String!): Category!
+  createPost(createPostInput: CreatePostInput!): Post!
+  updatePost(updatePostInput: UpdatePostInput!): Post!
+  removePost(id: String!): Post!
+  createCart(cartDetailInput: CreateCartDetailInput!): Cart!
+  updateCart(updateCartInput: UpdateCartInput!): Cart!
+  removeCart(cartID: String!): String!
+  removeCartDetail(CartDetailID: String!): String!
+  createComment(createCommentInput: CreateCommentInput!): Comment!
+  updateComment(updateCommentInput: UpdateCommentInput!): Comment!
+  removeComment(commentid: String!): String!
+  login(loginUserInput: LoginUserInput!): LoginResponse!
+  createOrder(createOrderInput: CreateOrderInput!): Order!
+  updateOrder(updateOrderInput: UpdateOrderInput!): Order!
+}
+
+input CreateUserInput {
+  username: String
+  password: String
+  fullname: String
+}
+
+input UpdateUserInput {
+  username: String
+  password: String
+  fullname: String
+  userID: String!
+  isHidden: Boolean
+}
+
+input CreateBookInput {
+  bookName: String!
+  author: String!
+  bookNumber: Int!
+  priceABook: Float!
+  categoriesID: [String!]
+  isHidden: Boolean = true
+}
+
+input UpdateBookInput {
+  bookName: String!
+  author: String!
+  bookNumber: Int!
+  priceABook: Float!
+  categoriesID: [String!]
+  isHidden: Boolean = true
+  bookID: String!
+  categories: [String!]
+}
+
+input CreateCategoryInput {
+  categoryName: String!
+}
+
+input UpdateCategoryInput {
+  categoryName: String!
+  categoryID: String!
+  isHidden: Boolean
+}
+
+input CreatePostInput {
+  title: String!
+  description: String!
+}
+
+input UpdatePostInput {
+  title: String!
+  description: String!
+  postID: String!
+}
+
+input CreateCartDetailInput {
+  BookID: String!
+  numberAdd: Int!
+}
+
+input UpdateCartInput {
+  BookID: String
+  numberAdd: Int
+  id: String!
+}
+
+input CreateCommentInput {
+  postID: String!
+  description: String!
+}
+
+input UpdateCommentInput {
+  postID: String
+  description: String!
+  commentid: String!
+}
+
+input LoginUserInput {
+  username: String!
+  password: String!
+}
+
+input CreateOrderInput {
+  cartID: String!
+  address: String!
+}
+
+input UpdateOrderInput {
+  cartID: String
+  address: String
+  orderID: String!
+  orderStatus: String!
+}
