@@ -39,16 +39,34 @@ export class CommentsService {
     });
   }
 
-  async update(commentid: string, updateCommentInput: UpdateCommentInput) {
-    let commentFound = await this.findOne(commentid);
-    if (updateCommentInput.description) {
-      commentFound.description = updateCommentInput.description
-    }
-    return await this.commentRepository.save(commentFound);
+  async findOneCommentOfUser(commentid: string, user: User) {
+    return await this.commentRepository.findOne({
+      where: {
+        commentID: commentid,
+        user: await user
+      }, relations: ['user', 'post']
+    });
   }
 
-  async remove(commentid: string) {
-    let commentFound = await this.findOne(commentid);
+
+
+  async update(userID: string, commentid: string, updateCommentInput: UpdateCommentInput) {
+    let userFound = await this.userService.findOne(userID);
+    let commentFound = await this.findOneCommentOfUser(commentid, userFound);
+    if (commentFound) {
+      if (updateCommentInput.description) {
+        commentFound.description = updateCommentInput.description
+      }
+      return await this.commentRepository.save(commentFound);
+    } else {
+      throw new Error("not found");
+    }
+  }
+
+  async remove(userID: string, commentid: string) {
+    let userFound = await this.userService.findOne(userID);
+    let commentFound = await this.findOneCommentOfUser(commentid, userFound);
+    
     if (commentFound) {
       await this.commentRepository.remove(commentFound);
       return "remove comment success";

@@ -19,8 +19,9 @@ export class BooksResolver {
   }
 
   @Query(() => [Book], { name: 'books' })
-  findAll() {
-    return this.booksService.findAll();
+  findAll(@Args('pageNumber', { type: () => Int }) pageNumber: number,
+    @Args('numberofAPage', { type: () => Int }) numberofAPage: number) {
+    return this.booksService.findAll(pageNumber, numberofAPage);
   }
   @Query(() => [Book], { name: 'somebooks' })
   findSome(@Args('name', { type: () => String }) name: string) {

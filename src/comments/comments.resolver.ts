@@ -30,13 +30,13 @@ export class CommentsResolver {
 
   @Mutation(() => Comment)
   @UseGuards(JwtGuard, new RoleGuard(Role.CUSTOMER))
-  updateComment(@Args('updateCommentInput') updateCommentInput: UpdateCommentInput) {
-    return this.commentsService.update(updateCommentInput.commentid, updateCommentInput);
+  updateComment(@Args('updateCommentInput') updateCommentInput: UpdateCommentInput, @Context("user") user: any) {
+    return this.commentsService.update(user.userID, updateCommentInput.commentid, updateCommentInput);
   }
 
   @Mutation(() => String)
   @UseGuards(JwtGuard, new RoleGuard(Role.CUSTOMER))
-  removeComment(@Args('commentid', { type: () => String }) id: string): Promise<string> {
-    return this.commentsService.remove(id);
+  removeComment(@Args('commentid', { type: () => String }) id: string, @Context("user") user: any): Promise<string> {
+    return this.commentsService.remove(user.userID, id);
   }
 }

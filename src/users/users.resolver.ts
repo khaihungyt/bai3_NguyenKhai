@@ -19,8 +19,9 @@ export class UsersResolver {
 
   @Query(() => [User], { name: 'users' })
   @UseGuards(JwtGuard, new RoleGuard(Role.ADMIN))
-  findAll() {
-    return this.usersService.findAll();
+  findAll(@Args('pageNumber', { type: () => Int }) pageNumber: number,
+    @Args('numberofAPage', { type: () => Int }) numberofAPage: number) {
+    return this.usersService.findAll(pageNumber, numberofAPage);
   }
 
   @Query(() => User, { name: 'user' })
@@ -44,7 +45,7 @@ export class UsersResolver {
     @Args({ name: "password", type: () => String }) password: string,
     @Context("user") user: User): any {
     let payload = {
-      id: user.userID,
+      userID: user.userID,
       fullname: user.fullname,
       username: user.username,
       role: user.role,

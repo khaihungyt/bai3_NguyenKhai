@@ -24,23 +24,29 @@ import { CartDetail } from './carts/entities/cartdetail.entity';
 import { OrderDetail } from './orders/entities/orderdetail.entity';
 import { Category } from './categories/entities/category.entity';
 import { AuthModule } from './auth/auth.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 @Module({
-  imports: [GraphQLModule.forRoot<ApolloDriverConfig>({
+  imports: [ConfigModule.forRoot(),
+  GraphQLModule.forRoot<ApolloDriverConfig>({
     driver: ApolloDriver,
-    autoSchemaFile: join(process.cwd(), 'src/grapghql/schema.gql'),
+    autoSchemaFile: join(process.cwd(), process.env.GRAPHQL_SCHEMA_PATH),
     playground: true,  // Bật giao diện playground
     context: ({ req }) => ({ req }),
   }),
-  TypeOrmModule.forRoot({
-    type: 'mysql',
-    host: 'localhost',
-    port: 3306,
-    username: 'root',
-    password: 'Khaideptrai1972',
-    database: 'bai8_nguyenkhai',
-    entities: [User, Book, Post, Comment, Category, Cart, Order, OrderDetail, CartDetail],
-    autoLoadEntities: true,
-    synchronize: true,
+  TypeOrmModule.forRootAsync({
+    imports: [ConfigModule],
+    inject: [ConfigService],
+    useFactory: (configService: ConfigService) => ({
+      type: 'mysql',
+      host: configService.get<string>('DATABASE_HOST'),
+      port: configService.get<number>('DATABASE_PORT'),
+      username: configService.get<string>('DATABASE_USER'),
+      password: configService.get<string>('DATABASE_PASSWORD'),
+      database: configService.get<string>('DATABASE_NAME'),
+      entities: [User, Book, Post, Comment, Category, Cart, Order, OrderDetail, CartDetail],
+      autoLoadEntities: true,
+      synchronize: false,
+    }),
   }), UsersModule, BooksModule, PostsModule, CartsModule, CategoriesModule, CommentsModule, AuthModule, OrdersModule
   ],
   controllers: [AppController],

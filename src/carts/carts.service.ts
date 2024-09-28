@@ -98,7 +98,7 @@ export class CartsService {
     const cartDetailRemove = await this.cartDetailRepository.findOne({
       where: {
         cartDetailID: cartDetailid
-
+        
       }, relations: ['cart']
     })
     await this.cartDetailRepository.remove(cartDetailRemove);

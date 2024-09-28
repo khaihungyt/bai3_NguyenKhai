@@ -37,8 +37,8 @@ export class CartsResolver {
 
   @Mutation(() => String)
   @UseGuards(JwtGuard, new RoleGuard(Role.CUSTOMER))
-  removeCart(@Args('cartID', { type: () => String }) id: string): Promise<string> {
-    return this.cartsService.remove(id);
+  removeCart(@Args('cartID', { type: () => String }) id: string, @Context("user") user: any): Promise<string> {
+    return this.cartsService.remove( id);
   }
 
   @Mutation(() => String)

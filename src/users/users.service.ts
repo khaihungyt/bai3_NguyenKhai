@@ -19,17 +19,20 @@ export class UsersService {
     }
   }
 
-  findAll() {
+  findAll(pageNumber: number, numberofAPage: number) {
+    const skip = (pageNumber - 1) * numberofAPage; // Tính toán số bản ghi cần bỏ qua
     return this.usersRepository.find({
       where: {
         isHidden: true,
       },
-      relations: ['posts', 'orders', 'cart', 'comments']
+      relations: ['posts', 'orders', 'cart', 'comments'],
+      skip: skip, // Số bản ghi cần bỏ qua
+      take: numberofAPage, // Số bản ghi cần lấy
     });
   }
 
-  findOne(id: string) {
-    return this.usersRepository.findOne({
+  async findOne(id: string) {
+    return await this.usersRepository.findOne({
       where: {
         isHidden: true,
         userID: id

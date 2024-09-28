@@ -17,7 +17,6 @@ export class JwtGuard implements CanActivate {
                 return true;
             } catch (error) {
                 throw new HttpException("Invalid Token: " + error.message, HttpStatus.UNAUTHORIZED)
-
             }
         }
         else {

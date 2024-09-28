@@ -23,12 +23,15 @@ export class CategoriesService {
     }
   }
 
-  findAll() {
-    return this.categoriesRespository.find({
+  async findAll(pageNumber: number, numberofAPage: number) {
+    const skip = (pageNumber - 1) * numberofAPage;
+    return await this.categoriesRespository.find({
       where: {
         isHidden: true
       },
       relations: ['book'],
+      skip: skip, // Số bản ghi cần bỏ qua
+      take: numberofAPage, // Số bản ghi cần lấy
     });
   }
 

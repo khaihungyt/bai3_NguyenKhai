@@ -19,8 +19,9 @@ export class CategoriesResolver {
   }
 
   @Query(() => [Category], { name: 'categories' })
-  findAll() {
-    return this.categoriesService.findAll();
+  findAll(@Args('pageNumber', { type: () => Int }) pageNumber: number,
+  @Args('numberofAPage', { type: () => Int }) numberofAPage: number) {
+    return this.categoriesService.findAll(pageNumber, numberofAPage);
   }
 
   @Query(() => Category, { name: 'category' })
