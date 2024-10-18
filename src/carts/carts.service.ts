@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { CreateCartDetailInput } from './dto/create-cartDetail.input';
 import { UpdateCartInput } from './dto/update-cart.input';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,7 +14,7 @@ export class CartsService {
   constructor(@InjectRepository(Cart) private cartRepository: Repository<Cart>,
     @InjectRepository(CartDetail) private cartDetailRepository: Repository<CartDetail>, // Repository cho CartDetail
     private userSerVice: UsersService,
-    private bookSerVice: BooksService) { }
+    @Inject(forwardRef(() => BooksService)) private bookSerVice: BooksService) { }
   async create(userID: string, createCartDetailInput: CreateCartDetailInput) {
     const cart = await this.findOne(userID)
     const user = await this.userSerVice.findOne(userID);
@@ -98,7 +98,7 @@ export class CartsService {
     const cartDetailRemove = await this.cartDetailRepository.findOne({
       where: {
         cartDetailID: cartDetailid
-        
+
       }, relations: ['cart']
     })
     await this.cartDetailRepository.remove(cartDetailRemove);

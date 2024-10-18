@@ -1,12 +1,13 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Int, Context } from '@nestjs/graphql';
 import { OrdersService } from './orders.service';
 import { Order } from './entities/order.entity';
 import { CreateOrderInput } from './dto/create-order.input';
 import { UpdateOrderInput } from './dto/update-order.input';
-import { UseGuards } from '@nestjs/common';
+import { Req, Res, UseGuards } from '@nestjs/common';
 import { JwtGuard } from 'src/auth/jwt.guard';
 import { Role } from 'src/users/entities/user.entity';
 import { RoleGuard } from 'src/auth/role-guard';
+import { CreateOrderABookInput } from './dto/create-orderabook.input';
 
 @Resolver(() => Order)
 export class OrdersResolver {
@@ -34,8 +35,10 @@ export class OrdersResolver {
     return this.ordersService.update(updateOrderInput.orderID, updateOrderInput);
   }
 
-  // @Mutation(() => Order)
-  // removeOrder(@Args('id', { type: () => Int }) id: number) {
-  //   return this.ordersService.remove(id);
-  // }
+  @Mutation(() => Order)
+  @UseGuards(JwtGuard, new RoleGuard(Role.CUSTOMER))
+  createOrderAbook(@Args('createOrderABookInput') CreateOrderABookInput: CreateOrderABookInput, @Context("user") user: any) {
+    return this.ordersService.createOrderABook(CreateOrderABookInput, user.userID);
+  }
+
 }

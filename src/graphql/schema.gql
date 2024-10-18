@@ -107,13 +107,13 @@ type Query {
   book(id: String!): Book!
   categories(pageNumber: Int!, numberofAPage: Int!): [Category!]!
   category(id: String!): Category!
-  posts: [Post!]!
-  post(postid: String!): Post!
-  cart(id: String!): Cart!
-  comments: [Comment!]!
-  comment(commentid: String!): Comment!
   orders: [Order!]!
   someorderuser(userid: String!): [Order!]!
+  cart(id: String!): Cart!
+  posts: [Post!]!
+  post(postid: String!): Post!
+  comments: [Comment!]!
+  comment(commentid: String!): Comment!
 }
 
 type Mutation {
@@ -126,19 +126,20 @@ type Mutation {
   createCategory(createCategoryInput: CreateCategoryInput!): Category!
   updateCategory(updateCategoryInput: UpdateCategoryInput!): Category!
   removeCategory(id: String!): Category!
-  createPost(createPostInput: CreatePostInput!): Post!
-  updatePost(updatePostInput: UpdatePostInput!): Post!
-  removePost(id: String!): Post!
+  createOrder(createOrderInput: CreateOrderInput!): Order!
+  updateOrder(updateOrderInput: UpdateOrderInput!): Order!
+  createOrderAbook(createOrderABookInput: CreateOrderABookInput!): Order!
   createCart(cartDetailInput: CreateCartDetailInput!): Cart!
   updateCart(updateCartInput: UpdateCartInput!): Cart!
   removeCart(cartID: String!): String!
   removeCartDetail(CartDetailID: String!): String!
+  createPost(createPostInput: CreatePostInput!): Post!
+  updatePost(updatePostInput: UpdatePostInput!): Post!
+  removePost(id: String!): Post!
   createComment(createCommentInput: CreateCommentInput!): Comment!
   updateComment(updateCommentInput: UpdateCommentInput!): Comment!
   removeComment(commentid: String!): String!
   login(loginUserInput: LoginUserInput!): LoginResponse!
-  createOrder(createOrderInput: CreateOrderInput!): Order!
-  updateOrder(updateOrderInput: UpdateOrderInput!): Order!
 }
 
 input CreateUserInput {
@@ -185,15 +186,22 @@ input UpdateCategoryInput {
   isHidden: Boolean
 }
 
-input CreatePostInput {
-  title: String!
-  description: String!
+input CreateOrderInput {
+  cartID: String!
+  address: String!
 }
 
-input UpdatePostInput {
-  title: String!
-  description: String!
-  postID: String!
+input UpdateOrderInput {
+  cartID: String
+  address: String
+  orderID: String!
+  orderStatus: String!
+}
+
+input CreateOrderABookInput {
+  bookID: String!
+  numberbookbuy: Int!
+  address: String!
 }
 
 input CreateCartDetailInput {
@@ -205,6 +213,17 @@ input UpdateCartInput {
   BookID: String
   numberAdd: Int
   id: String!
+}
+
+input CreatePostInput {
+  title: String!
+  description: String!
+}
+
+input UpdatePostInput {
+  title: String!
+  description: String!
+  postID: String!
 }
 
 input CreateCommentInput {
@@ -221,16 +240,4 @@ input UpdateCommentInput {
 input LoginUserInput {
   username: String!
   password: String!
-}
-
-input CreateOrderInput {
-  cartID: String!
-  address: String!
-}
-
-input UpdateOrderInput {
-  cartID: String
-  address: String
-  orderID: String!
-  orderStatus: String!
 }

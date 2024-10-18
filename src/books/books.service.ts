@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { CreateBookInput } from './dto/create-book.input';
 import { UpdateBookInput } from './dto/update-book.input';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,10 +6,11 @@ import { Book } from './entities/book.entity';
 import { Like, Repository } from 'typeorm';
 import { CategoriesService } from 'src/categories/categories.service';
 import { Category } from 'src/categories/entities/category.entity';
-
 @Injectable()
 export class BooksService {
   constructor(@InjectRepository(Book) private booksRepository: Repository<Book>,
+    // @Inject(forwardRef(() => OrdersService)) private orderService: OrdersService,
+    //private modulRef: ModuleRef,
     private CategoriesService: CategoriesService) { }
   async create(createBookInput: CreateBookInput) {
     let categories: Category[];
@@ -86,5 +87,12 @@ export class BooksService {
       bookFound.isHidden = false;
     }
     return this.booksRepository.save(bookFound);
+  }
+  async updateBookNumber(bookid: string, bookNumber: number) {
+    let book: Book = await this.findOne(bookid);
+    if (bookNumber > 0) {
+      book.bookNumber = bookNumber;
+    }
+    return await this.booksRepository.save(book);
   }
 }
