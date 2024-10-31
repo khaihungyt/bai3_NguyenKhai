@@ -14,13 +14,14 @@ import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
 import { MoMoController } from './momo.controller';
 import { BooksService } from 'src/books/books.service';
+import { OrdersController } from './orders.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Order, OrderDetail]),
   forwardRef(() => CartsModule), UsersModule, forwardRef(() => BooksModule),
     CategoriesModule, HttpModule,
   ConfigModule.forRoot()],
-  controllers: [MoMoController],
+  controllers: [MoMoController, OrdersController],
   providers: [OrdersResolver, OrdersService, UsersService],
   exports: [OrdersService, TypeOrmModule]
 })
