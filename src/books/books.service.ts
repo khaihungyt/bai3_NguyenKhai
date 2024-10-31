@@ -90,7 +90,7 @@ export class BooksService {
   }
   async updateBookNumber(bookid: string, bookNumber: number) {
     let book: Book = await this.findOne(bookid);
-    if (bookNumber > 0) {
+    if (bookNumber >= 0) {
       book.bookNumber = bookNumber;
     }
     return await this.booksRepository.save(book);
