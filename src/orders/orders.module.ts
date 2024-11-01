@@ -15,12 +15,23 @@ import { ConfigModule } from '@nestjs/config';
 import { MoMoController } from './momo.controller';
 import { BooksService } from 'src/books/books.service';
 import { OrdersController } from './orders.controller';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Order, OrderDetail]),
-  forwardRef(() => CartsModule), UsersModule, forwardRef(() => BooksModule),
+  imports: [TypeOrmModule.forFeature([Order, OrderDetail],
+  ), forwardRef(() => CartsModule), UsersModule, forwardRef(() => BooksModule),
     CategoriesModule, HttpModule,
-  ConfigModule.forRoot()],
+  ConfigModule.forRoot(),
+  // BullModule.forRoot({
+  //   redis: {
+  //     host: 'localhost',
+  //     port: 3000,
+  //   },
+  // }),
+  // BullModule.registerQueue({
+  //   name: 'order-queue',
+  // }),
+  ],
   controllers: [MoMoController, OrdersController],
   providers: [OrdersResolver, OrdersService, UsersService],
   exports: [OrdersService, TypeOrmModule]

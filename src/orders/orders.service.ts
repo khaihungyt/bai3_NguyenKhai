@@ -16,15 +16,22 @@ import { BooksService } from 'src/books/books.service';
 import { Book } from 'src/books/entities/book.entity';
 import { CreateOrderABookInput } from './dto/create-orderabook.input';
 import { User } from 'src/users/entities/user.entity';
+import * as AsyncLock from 'async-lock';
+import { Queue } from 'bull';
 @Injectable()
 export class OrdersService {
+ // private lock: AsyncLock;
   constructor(@InjectRepository(Order) private orderRepository: Repository<Order>,
     @InjectRepository(OrderDetail) private orderDetailRepository: Repository<OrderDetail>,
     @Inject(forwardRef(() => CartsService)) private cartService: CartsService,
     private userService: UsersService,
     private readonly httpService: HttpService,
     private configService: ConfigService,
-    @Inject(forwardRef(() => BooksService)) private bookService: BooksService) { }
+    @Inject(forwardRef(() => BooksService)) private bookService: BooksService,
+    //private readonly orderQueue: Queue
+  ) {
+   // this.lock = new AsyncLock();
+  }
   async create(createOrderInput: CreateOrderInput) {
     let cartFound: Cart = await this.cartService.findOneCart(createOrderInput.cartID);
     let cartDetails = cartFound.cartDetails;
@@ -226,13 +233,18 @@ export class OrdersService {
     });
   }
   async createOrderABook(CreateOrderABookInput: CreateOrderABookInput, userID: string) {
+    //return await this.lock.acquire("resource-key", async () => {
     const bookFound: Book = await this.bookService.findOne(CreateOrderABookInput.bookID);
     const userFound: User = await this.userService.findOne(userID);
     let quantityBookUpdate: number = bookFound.bookNumber - CreateOrderABookInput.numberbookbuy;
     if (quantityBookUpdate < 0) {
       throw new Error("sai so luong sach");
     }
-    let result1 = await this.payment(bookFound.priceABook * CreateOrderABookInput.numberbookbuy);
+    //let result1 = await this.payment(bookFound.priceABook * CreateOrderABookInput.numberbookbuy);
+    let result1 = {
+      resultCode: 0,
+      message: "hello world"
+    }
     if (result1.resultCode === 0) {
       await this.bookService.updateBookNumber(CreateOrderABookInput.bookID, quantityBookUpdate);
       const newOrder = await this.orderRepository.create({
@@ -255,6 +267,6 @@ export class OrdersService {
     } else {
       throw new Error(result1.message);
     }
+     //});
   }
-
 }
