@@ -18,9 +18,11 @@ import { CreateOrderABookInput } from './dto/create-orderabook.input';
 import { User } from 'src/users/entities/user.entity';
 import * as AsyncLock from 'async-lock';
 import { Queue } from 'bull';
+import { InjectRedis } from '@nestjs-modules/ioredis';
+import Redis from 'ioredis';
 @Injectable()
 export class OrdersService {
- // private lock: AsyncLock;
+  // private lock: AsyncLock;
   constructor(@InjectRepository(Order) private orderRepository: Repository<Order>,
     @InjectRepository(OrderDetail) private orderDetailRepository: Repository<OrderDetail>,
     @Inject(forwardRef(() => CartsService)) private cartService: CartsService,
@@ -29,8 +31,9 @@ export class OrdersService {
     private configService: ConfigService,
     @Inject(forwardRef(() => BooksService)) private bookService: BooksService,
     //private readonly orderQueue: Queue
+    @InjectRedis() private readonly redisService: Redis
   ) {
-   // this.lock = new AsyncLock();
+    // this.lock = new AsyncLock();
   }
   async create(createOrderInput: CreateOrderInput) {
     let cartFound: Cart = await this.cartService.findOneCart(createOrderInput.cartID);
@@ -234,10 +237,17 @@ export class OrdersService {
   }
   async createOrderABook(CreateOrderABookInput: CreateOrderABookInput, userID: string) {
     //return await this.lock.acquire("resource-key", async () => {
+    const cacheKey = `lock:${CreateOrderABookInput.bookID}`;
+    const lock = await this.redisService.set(cacheKey, 'locked', 'EX', 10);
+    if (!lock) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      return this.createOrderABook(CreateOrderABookInput, userID);
+    }
     const bookFound: Book = await this.bookService.findOne(CreateOrderABookInput.bookID);
     const userFound: User = await this.userService.findOne(userID);
     let quantityBookUpdate: number = bookFound.bookNumber - CreateOrderABookInput.numberbookbuy;
     if (quantityBookUpdate < 0) {
+      await this.redisService.set(cacheKey, "sai so luong sach", 'EX', 60);
       throw new Error("sai so luong sach");
     }
     //let result1 = await this.payment(bookFound.priceABook * CreateOrderABookInput.numberbookbuy);
@@ -263,10 +273,12 @@ export class OrdersService {
       });
       await this.orderDetailRepository.save(orderDetail);
       newOrder.orderDetails = [orderDetail];
-      return await this.orderRepository.save(newOrder);
+      let fullOrder = await this.orderRepository.save(newOrder);
+      await this.redisService.del(cacheKey);
+      return fullOrder;
     } else {
       throw new Error(result1.message);
     }
-     //});
+    //});
   }
 }

@@ -16,7 +16,8 @@ import { MoMoController } from './momo.controller';
 import { BooksService } from 'src/books/books.service';
 import { OrdersController } from './orders.controller';
 import { BullModule } from '@nestjs/bull';
-
+import { RedisModule } from '@nestjs-modules/ioredis';
+import { createClient } from '@redis/client';
 @Module({
   imports: [TypeOrmModule.forFeature([Order, OrderDetail],
   ), forwardRef(() => CartsModule), UsersModule, forwardRef(() => BooksModule),
@@ -31,9 +32,31 @@ import { BullModule } from '@nestjs/bull';
   // BullModule.registerQueue({
   //   name: 'order-queue',
   // }),
+  RedisModule.forRoot({
+    type: 'single',
+    url: 'redis://:123@redis-15027.c241.us-east-1-4.ec2.redns.redis-cloud.com:15027',
+  }),
   ],
   controllers: [MoMoController, OrdersController],
-  providers: [OrdersResolver, OrdersService, UsersService],
-  exports: [OrdersService, TypeOrmModule]
+  providers: [
+    // {
+    //   provide: 'REDIS_OPTIONS',
+    //   useValue: {
+    //     url: 'redis://localhost:6379'
+    //   }
+    // },
+    // {
+    //   inject: ['REDIS_OPTIONS'],
+    //   provide: 'REDIS_CLIENT',
+    //   useFactory: async (options: { url: string }) => {
+    //     const client = createClient(options);
+    //     await client.connect();
+    //     return client;
+    //   }
+    // },
+    OrdersResolver, OrdersService, UsersService],
+  exports: [OrdersService, TypeOrmModule
+    //, 'REDIS_CLIENT'
+  ]
 })
 export class OrdersModule { }

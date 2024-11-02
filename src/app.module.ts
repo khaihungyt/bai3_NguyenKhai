@@ -25,6 +25,7 @@ import { OrderDetail } from './orders/entities/orderdetail.entity';
 import { Category } from './categories/entities/category.entity';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { RedisModule } from '@nestjs-modules/ioredis';
 @Module({
   imports: [ConfigModule.forRoot(),
   GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -47,7 +48,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       autoLoadEntities: true,
       synchronize: false,
     }),
-  }), UsersModule, BooksModule, PostsModule, CartsModule, CategoriesModule, CommentsModule, AuthModule, OrdersModule
+  }),
+    UsersModule, BooksModule, PostsModule, CartsModule, CategoriesModule, CommentsModule, AuthModule, OrdersModule
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],

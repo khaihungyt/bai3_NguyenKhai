@@ -16,7 +16,6 @@ import { CartDetail } from 'src/carts/entities/cartdetail.entity';
   imports: [TypeOrmModule.forFeature([Book]),
     CategoriesModule, forwardRef(() => OrdersModule),
   forwardRef(() => CartsModule)],
-
   providers: [BooksResolver, BooksService, CategoriesService],
   exports: [BooksService, TypeOrmModule]
 })
